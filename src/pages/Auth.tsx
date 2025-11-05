@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { toast } from "sonner";
 import { Loader2, Briefcase, HardHat } from "lucide-react";
+import { signUpSchema, loginSchema } from "@/lib/validationSchemas";
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -29,29 +30,66 @@ const Auth = () => {
 
     try {
       if (isLogin) {
-        const { data, error } = await supabase.auth.signInWithPassword({
-          email: formData.email,
-          password: formData.password,
+        const validationResult = loginSchema.safeParse({ 
+          email: formData.email, 
+          password: formData.password 
+        });
+        
+        if (!validationResult.success) {
+          toast.error(validationResult.error.errors[0].message);
+          setLoading(false);
+          return;
+        }
+
+        const { error } = await supabase.auth.signInWithPassword({
+          email: validationResult.data.email,
+          password: validationResult.data.password,
         });
 
-        if (error) throw error;
+        if (error) {
+          toast.error("Invalid email or password");
+          setLoading(false);
+          return;
+        }
 
         toast.success("Welcome back!");
         navigate("/dashboard");
       } else {
-        const { data, error } = await supabase.auth.signUp({
-          email: formData.email,
+        const validationResult = signUpSchema.safeParse({ 
+          email: formData.email, 
           password: formData.password,
+          fullName: formData.fullName,
+          phone: formData.phone || '',
+          role: role
+        });
+        
+        if (!validationResult.success) {
+          toast.error(validationResult.error.errors[0].message);
+          setLoading(false);
+          return;
+        }
+
+        const { error } = await supabase.auth.signUp({
+          email: validationResult.data.email,
+          password: validationResult.data.password,
           options: {
             data: {
-              full_name: formData.fullName,
-              role: role,
+              full_name: validationResult.data.fullName,
+              role: validationResult.data.role,
             },
             emailRedirectTo: `${window.location.origin}/dashboard`,
           },
         });
 
-        if (error) throw error;
+        if (error) {
+          if (error.message.includes('already registered')) {
+            toast.error("This email is already registered");
+          } else {
+            toast.error("Failed to create account");
+          }
+          setLoading(false);
+          return;
+        }
 
         toast.success("Account created successfully!");
         
@@ -61,8 +99,8 @@ const Auth = () => {
           navigate("/dashboard");
         }
       }
-    } catch (error: any) {
-      toast.error(error.message || "Authentication failed");
+    } catch (error) {
+      toast.error("An unexpected error occurred");
     } finally {
       setLoading(false);
     }

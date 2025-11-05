@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import { format } from "date-fns";
 import { ArrowLeft, Calendar as CalendarIcon, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { bookingSchema } from "@/lib/validationSchemas";
 
 const Booking = () => {
   const { workerId } = useParams();
@@ -55,29 +56,51 @@ const Booking = () => {
 
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Not authenticated");
+      if (!user) {
+        toast.error("You must be logged in");
+        navigate("/auth");
+        setLoading(false);
+        return;
+      }
 
-      const agreedRate = formData.durationHours 
-        ? parseFloat(formData.durationHours) * worker.hourly_rate
+      const validationResult = bookingSchema.safeParse({
+        bookingDate,
+        startTime: formData.startTime || '',
+        durationHours: formData.durationHours ? Number(formData.durationHours) : 0,
+        workDescription: formData.workDescription,
+      });
+
+      if (!validationResult.success) {
+        toast.error(validationResult.error.errors[0].message);
+        setLoading(false);
+        return;
+      }
+
+      const agreedRate = validationResult.data.durationHours 
+        ? validationResult.data.durationHours * worker.hourly_rate
         : worker.daily_rate || worker.hourly_rate * 8;
 
-      const { error: bookingError } = await supabase.from("bookings").insert({
+      const { error } = await supabase.from("bookings").insert({
         hirer_id: user.id,
         worker_id: workerId,
-        booking_date: format(bookingDate, "yyyy-MM-dd"),
-        start_time: formData.startTime || null,
-        duration_hours: formData.durationHours ? parseFloat(formData.durationHours) : null,
-        work_description: formData.workDescription,
+        booking_date: format(validationResult.data.bookingDate, "yyyy-MM-dd"),
+        start_time: validationResult.data.startTime || null,
+        duration_hours: validationResult.data.durationHours || null,
+        work_description: validationResult.data.workDescription,
         agreed_rate: agreedRate,
         status: "pending",
       });
 
-      if (bookingError) throw bookingError;
+      if (error) {
+        toast.error("Failed to create booking");
+        setLoading(false);
+        return;
+      }
 
       toast.success("Booking request submitted successfully!");
       navigate("/dashboard");
-    } catch (error: any) {
-      toast.error(error.message || "Failed to create booking");
+    } catch (error) {
+      toast.error("An unexpected error occurred");
     } finally {
       setLoading(false);
     }

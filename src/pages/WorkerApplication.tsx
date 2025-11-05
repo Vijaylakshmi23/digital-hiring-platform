@@ -9,6 +9,7 @@ import { Card } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
+import { workerApplicationSchema } from "@/lib/validationSchemas";
 
 const WorkerApplication = () => {
   const navigate = useNavigate();
@@ -38,26 +39,52 @@ const WorkerApplication = () => {
 
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Not authenticated");
+      if (!user) {
+        toast.error("You must be logged in");
+        navigate("/auth");
+        setLoading(false);
+        return;
+      }
 
-      const skillsArray = formData.skills.split(",").map(s => s.trim()).filter(Boolean);
+      const validationResult = workerApplicationSchema.safeParse({
+        categoryId: formData.categoryId,
+        hourlyRate: Number(formData.hourlyRate),
+        dailyRate: formData.dailyRate ? Number(formData.dailyRate) : 0,
+        experienceYears: Number(formData.experienceYears),
+        skills: formData.skills,
+        bio: formData.bio || '',
+      });
+
+      if (!validationResult.success) {
+        toast.error(validationResult.error.errors[0].message);
+        setLoading(false);
+        return;
+      }
 
       const { error } = await supabase.from("worker_profiles").insert({
         user_id: user.id,
-        category_id: formData.categoryId,
-        hourly_rate: parseFloat(formData.hourlyRate),
-        daily_rate: formData.dailyRate ? parseFloat(formData.dailyRate) : null,
-        experience_years: parseInt(formData.experienceYears),
-        skills: skillsArray,
-        bio: formData.bio,
+        category_id: validationResult.data.categoryId,
+        hourly_rate: validationResult.data.hourlyRate,
+        daily_rate: validationResult.data.dailyRate || null,
+        experience_years: validationResult.data.experienceYears,
+        skills: validationResult.data.skills,
+        bio: validationResult.data.bio || null,
       });
 
-      if (error) throw error;
+      if (error) {
+        if (error.code === '23505') {
+          toast.error("You have already submitted an application");
+        } else {
+          toast.error("Failed to submit application");
+        }
+        setLoading(false);
+        return;
+      }
 
       toast.success("Application submitted successfully!");
       navigate("/dashboard");
-    } catch (error: any) {
-      toast.error(error.message || "Failed to submit application");
+    } catch (error) {
+      toast.error("An unexpected error occurred");
     } finally {
       setLoading(false);
     }
