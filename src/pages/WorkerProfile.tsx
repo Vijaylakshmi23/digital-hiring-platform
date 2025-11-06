@@ -228,8 +228,8 @@ const WorkerProfile = () => {
                     <div className="flex items-center gap-2 text-base">
                       <DollarSign className="h-5 w-5 text-success" />
                       <span className="font-medium">
-                        ${workerProfile.hourly_rate}/hour
-                        {workerProfile.daily_rate && ` • $${workerProfile.daily_rate}/day`}
+                        ₹{workerProfile.hourly_rate}/hour
+                        {workerProfile.daily_rate && ` • ₹${workerProfile.daily_rate}/day`}
                       </span>
                     </div>
                     {workerProfile.experience_years && (
@@ -310,9 +310,17 @@ const WorkerProfile = () => {
                           {booking.duration_hours ? `${booking.duration_hours} hours` : "Full day"}
                         </span>
                         <span className="font-semibold text-success">
-                          ${booking.agreed_rate}
+                          ₹{booking.agreed_rate}
                         </span>
                       </div>
+                      <Button 
+                        onClick={() => navigate(`/booking-detail/${booking.id}`)}
+                        variant="outline"
+                        size="sm"
+                        className="mt-2 w-full"
+                      >
+                        View Details
+                      </Button>
                     </Card>
                   ))}
                 </div>

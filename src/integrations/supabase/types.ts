@@ -220,6 +220,47 @@ export type Database = {
         }
         Relationships: []
       }
+      reviews: {
+        Row: {
+          booking_id: string
+          created_at: string
+          hirer_id: string
+          id: string
+          rating: number
+          review_text: string | null
+          updated_at: string
+          worker_id: string
+        }
+        Insert: {
+          booking_id: string
+          created_at?: string
+          hirer_id: string
+          id?: string
+          rating: number
+          review_text?: string | null
+          updated_at?: string
+          worker_id: string
+        }
+        Update: {
+          booking_id?: string
+          created_at?: string
+          hirer_id?: string
+          id?: string
+          rating?: number
+          review_text?: string | null
+          updated_at?: string
+          worker_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reviews_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           created_at: string

@@ -135,7 +135,7 @@ const Booking = () => {
             <div className="mb-6">
               <h1 className="text-3xl font-bold mb-2">Book {worker.user.full_name}</h1>
               <p className="text-muted-foreground">
-                {worker.category?.name} • ${worker.hourly_rate}/hour
+                {worker.category?.name} • ₹{worker.hourly_rate}/hour
               </p>
             </div>
 
@@ -209,7 +209,7 @@ const Booking = () => {
                 <div className="flex justify-between items-center">
                   <span className="font-semibold">Estimated Cost:</span>
                   <span className="text-2xl font-bold text-primary">
-                    ${estimatedCost.toFixed(2)}
+                    ₹{estimatedCost.toFixed(2)}
                   </span>
                 </div>
                 <p className="text-sm text-muted-foreground mt-2">

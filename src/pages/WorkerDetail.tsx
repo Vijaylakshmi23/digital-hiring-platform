@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Calendar } from "@/components/ui/calendar";
+import { ReviewsList } from "@/components/ReviewsList";
 import { ArrowLeft, Star, MapPin, Phone, DollarSign, Briefcase, Calendar as CalendarIcon } from "lucide-react";
 import { format, startOfMonth, endOfMonth } from "date-fns";
 
@@ -142,8 +143,8 @@ const WorkerDetail = () => {
                     <div className="flex items-center gap-2 text-base">
                       <DollarSign className="h-5 w-5 text-success" />
                       <span className="font-medium">
-                        ${worker.hourly_rate}/hour
-                        {worker.daily_rate && ` • $${worker.daily_rate}/day`}
+                        ₹{worker.hourly_rate}/hour
+                        {worker.daily_rate && ` • ₹${worker.daily_rate}/day`}
                       </span>
                     </div>
                     {worker.experience_years && (
@@ -192,6 +193,9 @@ const WorkerDetail = () => {
                 )}
               </div>
             </Card>
+
+            {/* Reviews Section */}
+            <ReviewsList workerId={workerId!} />
           </div>
 
           {/* Availability Calendar */}

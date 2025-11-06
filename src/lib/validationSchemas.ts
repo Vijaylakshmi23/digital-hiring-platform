@@ -18,11 +18,11 @@ export const loginSchema = z.object({
 export const workerApplicationSchema = z.object({
   categoryId: z.string().uuid({ message: "Please select a valid category" }),
   hourlyRate: z.number({ invalid_type_error: "Hourly rate must be a number" })
-    .min(5, { message: "Hourly rate must be at least $5" })
-    .max(500, { message: "Hourly rate cannot exceed $500" }),
+    .min(100, { message: "Hourly rate must be at least ₹100" })
+    .max(10000, { message: "Hourly rate cannot exceed ₹10,000" }),
   dailyRate: z.number({ invalid_type_error: "Daily rate must be a number" })
-    .min(40, { message: "Daily rate must be at least $40" })
-    .max(2000, { message: "Daily rate cannot exceed $2000" })
+    .min(500, { message: "Daily rate must be at least ₹500" })
+    .max(50000, { message: "Daily rate cannot exceed ₹50,000" })
     .optional()
     .or(z.literal(0)),
   experienceYears: z.number({ invalid_type_error: "Experience must be a number" })
