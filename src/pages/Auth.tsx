@@ -10,6 +10,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { toast } from "sonner";
 import { Loader2, Briefcase, HardHat } from "lucide-react";
 import { signUpSchema, loginSchema } from "@/lib/validationSchemas";
+import { handleSupabaseError } from "@/lib/errorMessages";
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -47,7 +48,7 @@ const Auth = () => {
         });
 
         if (error) {
-          toast.error("Invalid email or password");
+          toast.error(handleSupabaseError(error));
           setLoading(false);
           return;
         }
@@ -82,11 +83,7 @@ const Auth = () => {
         });
 
         if (error) {
-          if (error.message.includes('already registered')) {
-            toast.error("This email is already registered");
-          } else {
-            toast.error("Failed to create account");
-          }
+          toast.error(handleSupabaseError(error, "Failed to create account"));
           setLoading(false);
           return;
         }

@@ -5,7 +5,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { WorkerCard } from "@/components/WorkerCard";
-import { LogOut, Search } from "lucide-react";
+import { BookingsList } from "@/components/BookingsList";
+import { LogOut, Search, Calendar } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 
 const Dashboard = () => {
@@ -116,58 +118,105 @@ const Dashboard = () => {
 
       <main className="container mx-auto px-4 py-8">
         {profile?.role === "hirer" ? (
-          <>
-            <div className="mb-8">
-              <h2 className="text-3xl font-bold mb-6">Find Workers</h2>
-              
-              <div className="flex flex-col md:flex-row gap-4 mb-6">
-                <div className="flex-1 relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    placeholder="Search by name, skills, or description..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10"
-                  />
+          <Tabs defaultValue="browse" className="w-full">
+            <TabsList className="grid w-full max-w-md mx-auto grid-cols-2 mb-8">
+              <TabsTrigger value="browse">
+                <Search className="mr-2 h-4 w-4" />
+                Browse Workers
+              </TabsTrigger>
+              <TabsTrigger value="bookings">
+                <Calendar className="mr-2 h-4 w-4" />
+                My Bookings
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="browse">
+              <div className="mb-8">
+                <h2 className="text-3xl font-bold mb-6">Find Workers</h2>
+                
+                <div className="flex flex-col md:flex-row gap-4 mb-6">
+                  <div className="flex-1 relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      placeholder="Search by name, skills, or description..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="pl-10"
+                    />
+                  </div>
+                  <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                    <SelectTrigger className="w-full md:w-[200px]">
+                      <SelectValue placeholder="Category" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Categories</SelectItem>
+                      {categories.map((cat) => (
+                        <SelectItem key={cat.id} value={cat.id}>
+                          {cat.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
-                <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                  <SelectTrigger className="w-full md:w-[200px]">
-                    <SelectValue placeholder="Category" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Categories</SelectItem>
-                    {categories.map((cat) => (
-                      <SelectItem key={cat.id} value={cat.id}>
-                        {cat.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
               </div>
-            </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {workers.map((worker) => (
-                <WorkerCard key={worker.id} worker={worker} />
-              ))}
-            </div>
-
-            {workers.length === 0 && (
-              <div className="text-center py-12">
-                <p className="text-muted-foreground">No workers found matching your criteria</p>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {workers.map((worker) => (
+                  <WorkerCard key={worker.id} worker={worker} />
+                ))}
               </div>
-            )}
-          </>
+
+              {workers.length === 0 && (
+                <div className="text-center py-12">
+                  <p className="text-muted-foreground">No workers found matching your criteria</p>
+                </div>
+              )}
+            </TabsContent>
+
+            <TabsContent value="bookings">
+              <div className="mb-6">
+                <h2 className="text-3xl font-bold mb-2">My Bookings</h2>
+                <p className="text-muted-foreground">
+                  Track the status of your work requests
+                </p>
+              </div>
+              <BookingsList userId={user.id} userRole="hirer" />
+            </TabsContent>
+          </Tabs>
         ) : (
-          <div className="text-center py-12">
-            <h2 className="text-3xl font-bold mb-4">Worker Dashboard</h2>
-            <p className="text-muted-foreground mb-6">
-              Manage your profile, availability, and bookings
-            </p>
-            <Button onClick={() => navigate("/worker-profile")}>
-              View My Profile
-            </Button>
-          </div>
+          <Tabs defaultValue="bookings" className="w-full">
+            <TabsList className="grid w-full max-w-md mx-auto grid-cols-2 mb-8">
+              <TabsTrigger value="bookings">
+                <Calendar className="mr-2 h-4 w-4" />
+                My Bookings
+              </TabsTrigger>
+              <TabsTrigger value="profile">
+                My Profile
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="bookings">
+              <div className="mb-6">
+                <h2 className="text-3xl font-bold mb-2">My Bookings</h2>
+                <p className="text-muted-foreground">
+                  Manage your incoming work requests
+                </p>
+              </div>
+              <BookingsList userId={user.id} userRole="worker" />
+            </TabsContent>
+
+            <TabsContent value="profile">
+              <div className="text-center py-12">
+                <h2 className="text-3xl font-bold mb-4">Worker Profile</h2>
+                <p className="text-muted-foreground mb-6">
+                  Manage your profile and availability
+                </p>
+                <Button onClick={() => navigate("/worker-profile")}>
+                  View My Profile
+                </Button>
+              </div>
+            </TabsContent>
+          </Tabs>
         )}
       </main>
     </div>

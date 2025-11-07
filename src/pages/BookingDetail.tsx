@@ -9,6 +9,7 @@ import { ReviewForm } from "@/components/ReviewForm";
 import { ArrowLeft, Calendar, Clock, DollarSign } from "lucide-react";
 import { format } from "date-fns";
 import { toast } from "sonner";
+import { handleSupabaseError } from "@/lib/errorMessages";
 
 const BookingDetail = () => {
   const { bookingId } = useParams();
@@ -67,7 +68,7 @@ const BookingDetail = () => {
       .eq("id", bookingId);
 
     if (error) {
-      toast.error("Failed to update booking status");
+      toast.error(handleSupabaseError(error, "Failed to update booking status"));
     } else {
       toast.success("Booking status updated");
       loadData();

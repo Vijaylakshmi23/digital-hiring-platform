@@ -13,6 +13,7 @@ import { format } from "date-fns";
 import { ArrowLeft, Calendar as CalendarIcon, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { bookingSchema } from "@/lib/validationSchemas";
+import { handleSupabaseError } from "@/lib/errorMessages";
 
 const Booking = () => {
   const { workerId } = useParams();
@@ -92,7 +93,7 @@ const Booking = () => {
       });
 
       if (error) {
-        toast.error("Failed to create booking");
+        toast.error(handleSupabaseError(error, "Failed to create booking"));
         setLoading(false);
         return;
       }

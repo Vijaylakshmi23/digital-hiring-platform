@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import { workerApplicationSchema } from "@/lib/validationSchemas";
+import { handleSupabaseError } from "@/lib/errorMessages";
 
 const WorkerApplication = () => {
   const navigate = useNavigate();
@@ -72,11 +73,7 @@ const WorkerApplication = () => {
       });
 
       if (error) {
-        if (error.code === '23505') {
-          toast.error("You have already submitted an application");
-        } else {
-          toast.error("Failed to submit application");
-        }
+        toast.error(handleSupabaseError(error, "Failed to submit application"));
         setLoading(false);
         return;
       }

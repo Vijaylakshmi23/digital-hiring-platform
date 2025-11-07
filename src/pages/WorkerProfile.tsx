@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { ArrowLeft, Star, MapPin, Phone, DollarSign, Briefcase, Calendar as CalendarIcon, Bell } from "lucide-react";
 import { format, startOfMonth, endOfMonth } from "date-fns";
 import { toast } from "sonner";
+import { handleSupabaseError } from "@/lib/errorMessages";
 
 const WorkerProfile = () => {
   const navigate = useNavigate();
@@ -117,7 +118,7 @@ const WorkerProfile = () => {
         .eq("id", existing.id);
 
       if (error) {
-        toast.error("Failed to update availability");
+        toast.error(handleSupabaseError(error, "Failed to update availability"));
         return;
       }
     } else {
@@ -130,7 +131,7 @@ const WorkerProfile = () => {
         });
 
       if (error) {
-        toast.error("Failed to set availability");
+        toast.error(handleSupabaseError(error, "Failed to set availability"));
         return;
       }
     }

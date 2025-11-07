@@ -5,6 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
 import { Star } from "lucide-react";
 import { toast } from "sonner";
+import { handleSupabaseError } from "@/lib/errorMessages";
 
 interface ReviewFormProps {
   bookingId: string;
@@ -37,8 +38,7 @@ export const ReviewForm = ({ bookingId, workerId, hirerId, onReviewSubmitted }: 
       });
 
     if (error) {
-      toast.error("Failed to submit review");
-      console.error("Error submitting review:", error);
+      toast.error(handleSupabaseError(error, "Failed to submit review"));
     } else {
       toast.success("Review submitted successfully!");
       onReviewSubmitted();

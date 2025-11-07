@@ -7,6 +7,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Send } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
+import { handleSupabaseError } from "@/lib/errorMessages";
 
 interface Message {
   id: string;
@@ -73,7 +74,7 @@ export const BookingMessages = ({ bookingId, currentUserId }: BookingMessagesPro
       .order("created_at", { ascending: true });
 
     if (error) {
-      console.error("Error loading messages:", error);
+      toast.error(handleSupabaseError(error, "Failed to load messages"));
       return;
     }
 
@@ -93,8 +94,7 @@ export const BookingMessages = ({ bookingId, currentUserId }: BookingMessagesPro
       });
 
     if (error) {
-      toast.error("Failed to send message");
-      console.error("Error sending message:", error);
+      toast.error(handleSupabaseError(error, "Failed to send message"));
     } else {
       setNewMessage("");
     }
