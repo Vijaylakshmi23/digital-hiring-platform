@@ -9,7 +9,7 @@ import { Card } from "@/components/ui/card";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { toast } from "sonner";
-import { format } from "date-fns";
+import { format, startOfMonth, endOfMonth } from "date-fns";
 import { ArrowLeft, Calendar as CalendarIcon, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { bookingSchema } from "@/lib/validationSchemas";
@@ -21,6 +21,8 @@ const Booking = () => {
   const [worker, setWorker] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [bookingDate, setBookingDate] = useState<Date>();
+  const [availability, setAvailability] = useState<any[]>([]);
+  const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
   const [formData, setFormData] = useState({
     startTime: "",
     durationHours: "",
@@ -30,6 +32,10 @@ const Booking = () => {
   useEffect(() => {
     loadWorkerData();
   }, [workerId]);
+
+  useEffect(() => {
+    loadAvailability();
+  }, [currentMonth, workerId]);
 
   const loadWorkerData = async () => {
     const { data } = await supabase
@@ -45,11 +51,50 @@ const Booking = () => {
     setWorker(data);
   };
 
+  const loadAvailability = async () => {
+    if (!workerId) return;
+
+    const start = startOfMonth(currentMonth);
+    const end = endOfMonth(currentMonth);
+
+    const { data } = await supabase
+      .from("availability_calendar")
+      .select("*")
+      .eq("worker_id", workerId)
+      .gte("date", format(start, "yyyy-MM-dd"))
+      .lte("date", format(end, "yyyy-MM-dd"));
+
+    setAvailability(data || []);
+  };
+
+  const getAvailabilityForDate = (date: Date) => {
+    const dateStr = format(date, "yyyy-MM-dd");
+    return availability.find((a) => a.date === dateStr);
+  };
+
+  const isDateBookable = (date: Date) => {
+    // Disable past dates
+    if (date < new Date(new Date().setHours(0, 0, 0, 0))) return false;
+    
+    // Check worker availability
+    const avail = getAvailabilityForDate(date);
+    if (!avail) return true; // Allow if no availability set
+    
+    // Only allow "available" status
+    return avail.status === "available";
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!bookingDate) {
       toast.error("Please select a booking date");
+      return;
+    }
+
+    // Check if selected date is bookable
+    if (!isDateBookable(bookingDate)) {
+      toast.error("This date is not available for booking");
       return;
     }
 
@@ -73,6 +118,21 @@ const Booking = () => {
 
       if (!validationResult.success) {
         toast.error(validationResult.error.errors[0].message);
+        setLoading(false);
+        return;
+      }
+
+      // Double-check availability before inserting
+      const bookingDateStr = format(validationResult.data.bookingDate, "yyyy-MM-dd");
+      const { data: availData } = await supabase
+        .from("availability_calendar")
+        .select("status")
+        .eq("worker_id", workerId)
+        .eq("date", bookingDateStr)
+        .maybeSingle();
+
+      if (availData && availData.status !== "available") {
+        toast.error("This worker is not available on the selected date");
         setLoading(false);
         return;
       }
@@ -161,8 +221,9 @@ const Booking = () => {
                       mode="single"
                       selected={bookingDate}
                       onSelect={setBookingDate}
+                      onMonthChange={setCurrentMonth}
                       initialFocus
-                      disabled={(date) => date < new Date()}
+                      disabled={(date) => !isDateBookable(date)}
                       className="pointer-events-auto"
                     />
                   </PopoverContent>
