@@ -3,7 +3,15 @@ import { z } from 'zod';
 // Auth validation schemas
 export const signUpSchema = z.object({
   email: z.string().trim().email({ message: "Invalid email address" }).max(255),
-  password: z.string().min(6, { message: "Password must be at least 6 characters" }).max(100),
+  password: z.string()
+    .min(10, { message: "Password must be at least 10 characters" })
+    .max(100)
+    .refine((val) => (val.match(/\d/g) || []).length >= 2, {
+      message: "Password must contain at least 2 numeric digits"
+    })
+    .refine((val) => /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(val), {
+      message: "Password must contain at least 1 special character"
+    }),
   fullName: z.string().trim().min(2, { message: "Full name must be at least 2 characters" }).max(100),
   phone: z.string().trim().min(10, { message: "Phone must be at least 10 digits" }).max(20).optional().or(z.literal('')),
   role: z.enum(['hirer', 'worker'], { message: "Role must be either hirer or worker" }),
