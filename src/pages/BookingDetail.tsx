@@ -6,7 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { BookingMessages } from "@/components/BookingMessages";
 import { ReviewForm } from "@/components/ReviewForm";
-import { ArrowLeft, Calendar, Clock, DollarSign } from "lucide-react";
+import { ArrowLeft, Calendar, Clock, DollarSign, MessageCircle } from "lucide-react";
 import { format } from "date-fns";
 import { toast } from "sonner";
 import { handleSupabaseError } from "@/lib/errorMessages";
@@ -31,7 +31,7 @@ const BookingDetail = () => {
     }
     setCurrentUser(user);
 
-    const { data: bookingData } = await supabase
+    const { data: bookingData, error } = await supabase
       .from("bookings")
       .select(`
         *,
@@ -43,7 +43,13 @@ const BookingDetail = () => {
         hirer:profiles!bookings_hirer_id_fkey(*)
       `)
       .eq("id", bookingId)
-      .single();
+      .maybeSingle();
+
+    if (error) {
+      toast.error(handleSupabaseError(error, "Failed to load booking details"));
+      setLoading(false);
+      return;
+    }
 
     setBooking(bookingData);
 
@@ -122,7 +128,17 @@ const BookingDetail = () => {
 
               <div className="space-y-4">
                 <div>
-                  <h3 className="font-semibold mb-2">Worker</h3>
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className="font-semibold">Worker</h3>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => navigate(`/chat/${booking.worker.user_id}`)}
+                    >
+                      <MessageCircle className="h-4 w-4 mr-2" />
+                      Direct Chat
+                    </Button>
+                  </div>
                   <p className="text-muted-foreground">{booking.worker.user.full_name}</p>
                   <p className="text-sm text-muted-foreground">{booking.worker.category.name}</p>
                 </div>

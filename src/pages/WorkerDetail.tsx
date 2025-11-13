@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Calendar } from "@/components/ui/calendar";
 import { ReviewsList } from "@/components/ReviewsList";
-import { ArrowLeft, Star, MapPin, Phone, DollarSign, Briefcase, Calendar as CalendarIcon } from "lucide-react";
+import { ArrowLeft, Star, MapPin, Phone, DollarSign, Briefcase, Calendar as CalendarIcon, MessageCircle } from "lucide-react";
 import { format, startOfMonth, endOfMonth } from "date-fns";
 
 const WorkerDetail = () => {
@@ -253,6 +253,16 @@ const WorkerDetail = () => {
                 onClick={() => navigate(`/booking/${workerId}`)}
               >
                 Book Now
+              </Button>
+              
+              <Button 
+                className="w-full mt-3" 
+                size="lg"
+                variant="outline"
+                onClick={() => navigate(`/chat/${worker.user_id}`)}
+              >
+                <MessageCircle className="mr-2 h-5 w-5" />
+                Direct Chat
               </Button>
             </Card>
           </div>
