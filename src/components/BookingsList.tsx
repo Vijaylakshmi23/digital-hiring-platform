@@ -4,10 +4,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Calendar, Clock, Eye } from "lucide-react";
+import { Calendar, Clock, Eye, MessageCircle } from "lucide-react";
 import { format } from "date-fns";
 import { handleSupabaseError } from "@/lib/errorMessages";
 import { toast } from "sonner";
+import { useUnreadMessages } from "@/hooks/useUnreadMessages";
 
 interface BookingsListProps {
   userId: string;
@@ -18,6 +19,7 @@ export const BookingsList = ({ userId, userRole }: BookingsListProps) => {
   const navigate = useNavigate();
   const [bookings, setBookings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const unreadCounts = useUnreadMessages(userId);
 
   useEffect(() => {
     loadBookings();
@@ -165,6 +167,36 @@ export const BookingsList = ({ userId, userRole }: BookingsListProps) => {
                 <Eye className="mr-2 h-4 w-4" />
                 View Details
               </Button>
+              {booking.status === "confirmed" && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    const otherUserId = userRole === "hirer" 
+                      ? booking.worker.user_id 
+                      : booking.hirer_id;
+                    navigate(`/chat/${otherUserId}`);
+                  }}
+                  className="w-full md:w-auto relative"
+                >
+                  <MessageCircle className="mr-2 h-4 w-4" />
+                  Chat
+                  {(() => {
+                    const otherUserId = userRole === "hirer" 
+                      ? booking.worker.user_id 
+                      : booking.hirer_id;
+                    const count = unreadCounts[otherUserId];
+                    return count > 0 ? (
+                      <Badge 
+                        variant="destructive" 
+                        className="ml-2 h-5 min-w-5 px-1 text-xs"
+                      >
+                        {count}
+                      </Badge>
+                    ) : null;
+                  })()}
+                </Button>
+              )}
             </div>
           </div>
         </Card>
