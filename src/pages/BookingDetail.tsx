@@ -6,10 +6,12 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { BookingMessages } from "@/components/BookingMessages";
 import { ReviewForm } from "@/components/ReviewForm";
+import { ReviewsList } from "@/components/ReviewsList";
 import { ArrowLeft, Calendar, Clock, DollarSign, MessageCircle } from "lucide-react";
 import { format } from "date-fns";
 import { toast } from "sonner";
 import { handleSupabaseError } from "@/lib/errorMessages";
+import { useUnreadMessages } from "@/hooks/useUnreadMessages";
 
 const BookingDetail = () => {
   const { bookingId } = useParams();
@@ -18,6 +20,7 @@ const BookingDetail = () => {
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [existingReview, setExistingReview] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const unreadCounts = useUnreadMessages(currentUser?.id);
 
   useEffect(() => {
     loadData();
@@ -76,7 +79,17 @@ const BookingDetail = () => {
     if (error) {
       toast.error(handleSupabaseError(error, "Failed to update booking status"));
     } else {
-      toast.success("Booking status updated");
+      const statusMessage = newStatus === "confirmed" ? "accepted" : 
+                           newStatus === "completed" ? "completed" : "updated";
+      toast.success(`Booking ${statusMessage}`);
+      
+      // Show notification when worker completes the booking
+      if (newStatus === "completed") {
+        toast.info("Work completed! The hirer can now leave a review.", {
+          duration: 5000,
+        });
+      }
+      
       loadData();
     }
   };
@@ -134,9 +147,18 @@ const BookingDetail = () => {
                       variant="outline"
                       size="sm"
                       onClick={() => navigate(`/chat/${booking.worker.user_id}`)}
+                      className="relative"
                     >
                       <MessageCircle className="h-4 w-4 mr-2" />
                       Direct Chat
+                      {unreadCounts[booking.worker.user_id] > 0 && (
+                        <Badge 
+                          variant="destructive" 
+                          className="ml-2 h-5 min-w-5 px-1 text-xs"
+                        >
+                          {unreadCounts[booking.worker.user_id]}
+                        </Badge>
+                      )}
                     </Button>
                   </div>
                   <p className="text-muted-foreground">{booking.worker.user.full_name}</p>
@@ -223,7 +245,7 @@ const BookingDetail = () => {
             />
           </div>
 
-          <div className="lg:col-span-1">
+          <div className="lg:col-span-1 space-y-6">
             {canReview && (
               <ReviewForm
                 bookingId={bookingId!}
@@ -240,6 +262,8 @@ const BookingDetail = () => {
                 </p>
               </Card>
             )}
+            
+            <ReviewsList workerId={booking.worker_id} />
           </div>
         </div>
       </main>
