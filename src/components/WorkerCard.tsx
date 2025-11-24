@@ -9,6 +9,27 @@ interface WorkerCardProps {
   worker: any;
 }
 
+const RupeeIcon = (props: React.SVGProps<SVGSVGElement>) => (
+  <svg
+    width={16}
+    height={16}
+    viewBox="0 0 16 16"
+    fill="none"
+    {...props}
+  >
+    <text
+      x="2"
+      y="13"
+      fontFamily="Arial, sans-serif"
+      fontSize="14"
+      fontWeight="bold"
+      fill="currentColor"
+    >
+      ₹
+    </text>
+  </svg>
+);
+
 export const WorkerCard = ({ worker }: WorkerCardProps) => {
   const navigate = useNavigate();
 
