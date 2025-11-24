@@ -70,9 +70,10 @@ export const WorkerCard = ({ worker }: WorkerCardProps) => {
           <span className="font-bold text-success">₹</span>
           <RupeeIcon className="h-4 w-4 text-success" />
           <span>
-            {worker.hourly_rate}/hr
+            ₹{worker.hourly_rate}/hr
             {worker.daily_rate && ` • ₹{worker.daily_rate}/day`}
           </span>
+          <span className="font-bold text-success">₹</span>
         </div>
         
         {worker.user.phone && (
