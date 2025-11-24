@@ -67,6 +67,7 @@ export const WorkerCard = ({ worker }: WorkerCardProps) => {
 
       <div className="space-y-2 mb-4">
         <div className="flex items-center gap-2 text-sm">
+          <span className="font-bold text-success">₹</span>
           {worker.hourly_rate && <span>₹{worker.hourly_rate}/hr</span>}
           {worker.daily_rate && <span>₹{worker.daily_rate}/day</span>}
         </div>
@@ -81,14 +82,6 @@ export const WorkerCard = ({ worker }: WorkerCardProps) => {
               </div>
             ) : (
               <div className="text-sm text-muted-foreground">Phone not provided</div>
-            )}
-            {worker.user.address ? (
-              <div className="flex items-center gap-2 text-sm">
-                <MapPin className="h-4 w-4 text-destructive" />
-                <span className="line-clamp-1">{worker.user.address}</span>
-              </div>
-            ) : (
-              <div className="text-sm text-muted-foreground">Address not provided</div>
             )}
             {worker.user.email ? (
               <div className="flex items-center gap-2 text-sm">
