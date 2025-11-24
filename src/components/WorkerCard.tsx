@@ -2,7 +2,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Star, MapPin, Phone, Calendar } from "lucide-react";
+import { Star, MapPin, Phone, DollarSign, Calendar } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 interface WorkerCardProps {
