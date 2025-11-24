@@ -67,10 +67,9 @@ export const WorkerCard = ({ worker }: WorkerCardProps) => {
 
       <div className="space-y-2 mb-4">
         <div className="flex items-center gap-2 text-sm">
-          <RupeeIcon className="h-4 w-4 text-success" />
           <span>
             ₹{worker.hourly_rate}/hr
-            {worker.daily_rate && ` • ₹{worker.daily_rate}/day`}
+            ₹{worker.daily_rate}/day
           </span>
         </div>
         
