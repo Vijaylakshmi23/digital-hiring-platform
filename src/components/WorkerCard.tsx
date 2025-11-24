@@ -71,19 +71,35 @@ export const WorkerCard = ({ worker }: WorkerCardProps) => {
           {worker.daily_rate && <span>₹{worker.daily_rate}/day</span>}
         </div>
         
-        {worker.user.phone && (
-          <div className="flex items-center gap-2 text-sm">
-            <Phone className="h-4 w-4 text-primary" />
-            <span>{worker.user.phone}</span>
+        <div className="mb-4">
+          <h4 className="text-md font-semibold mb-2">Contact Information</h4>
+          <div className="space-y-2">
+            {worker.user.phone ? (
+              <div className="flex items-center gap-2 text-sm">
+                <Phone className="h-4 w-4 text-primary" />
+                <span>{worker.user.phone}</span>
+              </div>
+            ) : (
+              <div className="text-sm text-muted-foreground">Phone not provided</div>
+            )}
+            {worker.user.address ? (
+              <div className="flex items-center gap-2 text-sm">
+                <MapPin className="h-4 w-4 text-destructive" />
+                <span className="line-clamp-1">{worker.user.address}</span>
+              </div>
+            ) : (
+              <div className="text-sm text-muted-foreground">Address not provided</div>
+            )}
+            {worker.user.email ? (
+              <div className="flex items-center gap-2 text-sm">
+                <span className="font-medium">📧</span>
+                <span>{worker.user.email}</span>
+              </div>
+            ) : (
+              <div className="text-sm text-muted-foreground">Email not provided</div>
+            )}
           </div>
-        )}
-
-        {worker.user.address && (
-          <div className="flex items-center gap-2 text-sm">
-            <MapPin className="h-4 w-4 text-destructive" />
-            <span className="line-clamp-1">{worker.user.address}</span>
-          </div>
-        )}
+        </div>
 
         {worker.experience_years && (
           <div className="flex items-center gap-2 text-sm">
