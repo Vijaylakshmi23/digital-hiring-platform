@@ -314,14 +314,6 @@ const WorkerProfile = () => {
                           ₹{booking.agreed_rate}
                         </span>
                       </div>
-                      <Button 
-                        onClick={() => navigate(`/booking-detail/${booking.id}`)}
-                        variant="outline"
-                        size="sm"
-                        className="mt-2 w-full"
-                      >
-                        View Details
-                      </Button>
                     </Card>
                   ))}
                 </div>
