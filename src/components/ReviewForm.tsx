@@ -69,6 +69,7 @@ export const ReviewForm = ({ bookingId, workerId, hirerId, onReviewSubmitted }: 
                     : "text-muted-foreground"
                 }`}
               />
+              Rate the Worker
             </button>
           ))}
         </div>
