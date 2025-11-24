@@ -67,10 +67,8 @@ export const WorkerCard = ({ worker }: WorkerCardProps) => {
 
       <div className="space-y-2 mb-4">
         <div className="flex items-center gap-2 text-sm">
-          <span>
-            ₹{worker.hourly_rate}/hr
-            ₹{worker.daily_rate}/day
-          </span>
+          {worker.hourly_rate && <span>₹{worker.hourly_rate}/hr</span>}
+          {worker.daily_rate && <span>₹{worker.daily_rate}/day</span>}
         </div>
         
         {worker.user.phone && (
