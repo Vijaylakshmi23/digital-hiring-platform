@@ -11,6 +11,7 @@ import WorkerDetail from "./pages/WorkerDetail";
 import WorkerProfile from "./pages/WorkerProfile";
 import Booking from "./pages/Booking";
 import BookingDetail from "./pages/BookingDetail";
+import BookingDetails from "./pages/BookingDetails";
 import DirectChatPage from "./pages/DirectChatPage";
 import NotFound from "./pages/NotFound";
 
@@ -31,6 +32,7 @@ const App = () => (
           <Route path="/worker/:workerId" element={<WorkerDetail />} />
           <Route path="/booking/:workerId" element={<Booking />} />
           <Route path="/booking/:id" element={<BookingDetail />} />
+          <Route path="/booking/:id" element={<BookingDetails />} />
           <Route path="/booking-detail/:bookingId" element={<BookingDetail />} />
           <Route path="/chat/:userId" element={<DirectChatPage />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
