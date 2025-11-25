@@ -23,8 +23,12 @@ const BookingDetail = () => {
   const unreadCounts = useUnreadMessages(currentUser?.id);
 
   useEffect(() => {
-    loadData();
-  }, [bookingId]);
+  if (!bookingId) {
+    setLoading(false); // <-- Immediately stop loading if there's no bookingId
+    return;
+  }
+  loadData();
+}, [bookingId]);
 
   const loadData = async () => {
     const { data: { user } } = await supabase.auth.getUser();
