@@ -31,8 +31,10 @@ const BookingDetail = () => {
 }, [bookingId]);
 
   const loadData = async () => {
+  try {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
+      setLoading(false); // <-- Add this line before redirect
       navigate("/auth");
       return;
     }
@@ -52,9 +54,9 @@ const BookingDetail = () => {
       .eq("id", bookingId)
       .maybeSingle();
 
-    if (error) {
+    if (error || !bookingData) {
       toast.error(handleSupabaseError(error, "Failed to load booking details"));
-      setLoading(false);
+      setLoading(false); // <-- Already present, make sure it is before return
       return;
     }
 
@@ -70,10 +72,13 @@ const BookingDetail = () => {
       
       setExistingReview(reviewData);
     }
-
-    setLoading(false);
-  };
-
+    setLoading(false); // <-- After all async loading finishes
+  }
+  catch (err) {
+    setLoading(false); // <-- Ensure loading stops on any unexpected error
+    toast.error("Unexpected error while loading booking details.");
+  }
+};
   const handleStatusUpdate = async (newStatus: string) => {
     const { error } = await supabase
       .from("bookings")
