@@ -179,10 +179,10 @@ const WorkerDetail = () => {
 
               <div className="space-y-3">
                 <h2 className="text-xl font-semibold mb-3">Contact Information</h2>
-                {worker.user.address && (
+                {profile.address && (
                   <div className="flex items-center gap-3">
                     <MapPin className="h-5 w-5 text-destructive" />
-                    <span className="text-base">{worker.user.address}</span>
+                    <span className="text-base">{profile.address}</span>
                   </div>
                 )}
               </div>
